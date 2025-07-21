@@ -1,0 +1,495 @@
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700&display=swap');
+
+body {
+    font-family: 'Roboto', sans-serif;
+    background-color: #ffffff;
+    color: #111;
+    margin: 0;
+    padding: 0;
+}
+
+header {
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    margin: 0 auto;
+    padding: 24px 40px;
+    border-bottom: 1px solid #ccc;
+    font-size: 14px;
+}
+
+header .left {
+    color: #aaa;
+    width: 100px;
+}
+
+header .center {
+    font-weight: 400;
+    text-align: left;
+    margin-left: 100px;
+    flex-grow: 1;
+}
+
+header .center span {
+    font-size: 12px;
+    color: #888;
+}
+
+header .right {
+    width: 100px;
+    text-align: right;
+}
+
+header .right a {
+    color: #000;
+    text-decoration: none;
+    font-weight: 400;
+}
+
+main {
+    max-width: 800px;
+    margin: 60px 0;
+    padding: 0 40px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.project-meta {
+    font-size: 14px;
+    color: #999;
+    margin-bottom: 8px;
+}
+
+.project-title {
+    font-size: 24px;
+    font-weight: 400;
+    margin-bottom: 4px;
+}
+
+.project-subtitle {
+    font-size: 16px;
+    color: #999;
+    margin-bottom: 24px;
+}
+
+.advisor {
+    font-size: 14px;
+    margin-bottom: 40px;
+    color: #333;
+}
+
+.section-title {
+    font-weight: 700;
+    text-transform: uppercase;
+    margin-top: 40px;
+    margin-bottom: 12px;
+    font-size: 14px;
+}
+
+p {
+    font-size: 16px;
+    line-height: 1.6;
+    margin-bottom: 24px;
+    color: #111;
+}
+
+#mapbox-container-1, #mapbox-container-2, #mapbox-container-3 {
+    width: 100%;
+    height: 400px;
+    margin: 40px 0;
+    display: block;
+    border: 1px solid #ccc;
+}
+
+.controls {
+    display: flex;
+    gap: 12px;
+    margin: 24px 0;
+    justify-content: center;
+}
+
+.controls button {
+    padding: 8px 16px;
+    background-color: #f5f5f5;
+    color: #333;
+    border: 1px solid #ccc;
+    cursor: pointer;
+    font-size: 14px;
+    font-family: 'Roboto', sans-serif;
+    font-weight: 400;
+    transition: background-color 0.2s ease;
+}
+
+.controls button:hover {
+    background-color: #e5e5e5;
+}
+
+.controls button:active {
+    background-color: #d5d5d5;
+}
+
+/* Style for form elements in controls */
+.controls select,
+.controls input[type="text"] {
+    padding: 8px 12px;
+    background-color: #ffffff;
+    color: #333;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 14px;
+    font-family: 'Roboto', sans-serif;
+    font-weight: 400;
+    transition: border-color 0.2s ease;
+}
+
+.controls select:focus,
+.controls input[type="text"]:focus {
+    outline: none;
+    border-color: #0066cc;
+    box-shadow: 0 0 0 2px rgba(0, 102, 204, 0.2);
+}
+
+.controls select {
+    min-width: 120px;
+}
+
+.controls input[type="text"] {
+    min-width: 200px;
+}
+
+.info-panel {
+    background: white;
+    padding: 25px;
+    border-radius: 15px;
+    box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+.info-panel h3 {
+    color: #333;
+    margin-bottom: 15px;
+    font-size: 1.3rem;
+    border-bottom: 2px solid #4CAF50;
+    padding-bottom: 10px;
+}
+
+.info-panel ul {
+    list-style: none;
+    padding-left: 0;
+}
+
+.info-panel li {
+    padding: 8px 0;
+    border-bottom: 1px solid #eee;
+    position: relative;
+    padding-left: 25px;
+}
+
+.info-panel li:before {
+    content: "📍";
+    position: absolute;
+    left: 0;
+    color: #4CAF50;
+}
+
+.info-panel li:last-child {
+    border-bottom: none;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+    .container {
+        padding: 15px;
+    }
+    
+    header h1 {
+        font-size: 2rem;
+    }
+    
+    #map {
+        height: 400px;
+    }
+    
+    .controls {
+        flex-direction: column;
+        align-items: center;
+    }
+    
+    .controls button {
+        width: 200px;
+    }
+}
+
+@media (max-width: 480px) {
+    header h1 {
+        font-size: 1.5rem;
+    }
+    
+    #map {
+        height: 300px;
+    }
+    
+    .info-panel {
+        padding: 20px;
+    }
+}
+
+/* ======================================================================== */
+/* ADDITIONAL STYLES FOR PUBLIC RESTROOMS MAP */
+/* ======================================================================== */
+
+/* Main map container for restrooms */
+#mapbox-container-restrooms {
+    width: 100%;
+    height: 500px;
+    margin: 40px 0;
+    display: block;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+/* Enhanced controls layout */
+.controls .filter-group {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
+}
+
+.controls .filter-group label {
+    font-size: 12px;
+    font-weight: 600;
+    color: #555;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.controls .button-group {
+    display: flex;
+    gap: 8px;
+    margin-top: 12px;
+}
+
+/* Responsive controls for restrooms page */
+@media (max-width: 768px) {
+    .controls {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 16px;
+    }
+    
+    .controls .filter-group {
+        align-items: stretch;
+    }
+    
+    .controls .button-group {
+        flex-direction: column;
+        margin-top: 8px;
+    }
+    
+    .controls select,
+    .controls input[type="text"] {
+        min-width: unset;
+        width: 100%;
+    }
+}
+
+/* Statistics panel */
+.stats-panel {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 25px;
+    border-radius: 12px;
+    margin: 30px 0;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+}
+
+.stats-panel h3 {
+    margin: 0 0 20px 0;
+    font-size: 1.2rem;
+    font-weight: 600;
+    text-align: center;
+}
+
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 20px;
+}
+
+.stat-item {
+    text-align: center;
+    padding: 15px;
+    background: rgba(255, 255, 255, 0.15);
+    border-radius: 8px;
+    backdrop-filter: blur(10px);
+}
+
+.stat-number {
+    display: block;
+    font-size: 2rem;
+    font-weight: 700;
+    margin-bottom: 5px;
+}
+
+.stat-label {
+    font-size: 0.9rem;
+    opacity: 0.9;
+    font-weight: 300;
+}
+
+/* Enhanced info panel for restrooms */
+.info-panel {
+    background: white;
+    padding: 25px;
+    border-radius: 15px;
+    box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+    max-width: 700px;
+    margin: 30px auto;
+    border-left: 5px solid #4CAF50;
+}
+
+.info-panel h3 {
+    color: #333;
+    margin-bottom: 15px;
+    font-size: 1.3rem;
+    border-bottom: 2px solid #4CAF50;
+    padding-bottom: 10px;
+}
+
+.info-panel ul {
+    list-style: none;
+    padding-left: 0;
+}
+
+.info-panel li {
+    padding: 10px 0;
+    border-bottom: 1px solid #f0f0f0;
+    position: relative;
+    padding-left: 30px;
+    line-height: 1.5;
+}
+
+.info-panel li:before {
+    content: "🎯";
+    position: absolute;
+    left: 0;
+    color: #4CAF50;
+    font-size: 16px;
+}
+
+.info-panel li:last-child {
+    border-bottom: none;
+}
+
+/* Popup styles */
+.restroom-popup {
+    max-width: 300px;
+    font-family: 'Roboto', sans-serif;
+}
+
+.restroom-popup h3 {
+    border-bottom: 2px solid #4CAF50;
+    padding-bottom: 8px;
+    margin-bottom: 12px;
+}
+
+.popup-section {
+    margin-bottom: 8px;
+    padding: 4px 0;
+    line-height: 1.4;
+}
+
+.popup-section strong {
+    color: #333;
+}
+
+/* Button hover effects for restroom page */
+.controls button {
+    border-radius: 6px;
+    transition: all 0.3s ease;
+    border: 1px solid #ddd;
+}
+
+.controls button:hover {
+    background-color: #4CAF50;
+    color: white;
+    border-color: #4CAF50;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(76, 175, 80, 0.3);
+}
+
+.controls button:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 4px rgba(76, 175, 80, 0.3);
+}
+
+/* Enhanced select and input styling */
+.controls select,
+.controls input[type="text"] {
+    border-radius: 6px;
+    border: 1px solid #ddd;
+    transition: all 0.3s ease;
+}
+
+.controls select:focus,
+.controls input[type="text"]:focus {
+    border-color: #4CAF50;
+    box-shadow: 0 0 0 3px rgba(76, 175, 80, 0.1);
+}
+
+/* Loading and error states */
+.loading-message {
+    text-align: center;
+    padding: 40px;
+    color: #666;
+    font-style: italic;
+}
+
+.error-message {
+    background: #fee2e2;
+    color: #dc2626;
+    padding: 20px;
+    border-radius: 8px;
+    border: 1px solid #fecaca;
+    margin: 20px 0;
+    text-align: center;
+}
+
+/* Mobile responsiveness for restroom page */
+@media (max-width: 480px) {
+    #mapbox-container-restrooms {
+        height: 400px;
+        margin: 20px 0;
+    }
+    
+    .stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 10px;
+    }
+    
+    .stats-panel {
+        padding: 20px;
+        margin: 20px 0;
+    }
+    
+    .stat-number {
+        font-size: 1.5rem;
+    }
+    
+    .info-panel {
+        padding: 20px;
+        margin: 20px auto;
+    }
+    
+    .info-panel li {
+        padding-left: 25px;
+        font-size: 14px;
+    }
+    
+    .restroom-popup {
+        max-width: 250px;
+    }
+} 

@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NYC Public Restrooms - Interactive Map</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700&display=swap" rel="stylesheet">
+    <link href="https://api.mapbox.com/mapbox-gl-js/v2.15.0/mapbox-gl.css" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <main>
+        <div class="project-title">NYC Public Restrooms Finder</div>
+        <div class="project-subtitle">Interactive Map & Real-time Status</div>
+
+        <div class="section-title">Digital Object: Public Facilities Mapping</div>
+        <p>This interactive map displays all public restrooms across New York City, including parks, libraries, and other public facilities. Find nearby restrooms with detailed information about accessibility, operating hours, and current status. Perfect for tourists, residents, and anyone exploring the city!</p>
+
+        <!-- Main Map Section -->
+        <div class="section-title">🚻 NYC Public Restrooms Interactive Map</div>
+        <p>Explore over 1,000 public restroom locations throughout NYC. Click on any marker to see detailed information including accessibility features, operating hours, changing stations, and current operational status. Use the filters below to find exactly what you need!</p>
+        
+        <div id="mapbox-container-restrooms"></div>
+        
+        <!-- Enhanced Controls Section -->
+        <div class="controls">
+            <div class="filter-group">
+                <label for="searchFacility">🔍 Search Facilities:</label>
+                <input type="text" id="searchFacility" placeholder="Search by facility name or location...">
+            </div>
+            
+            <div class="filter-group">
+                <label for="statusFilter">📊 Status Filter:</label>
+                <select id="statusFilter">
+                    <option value="all">All Facilities</option>
+                    <option value="Operational">✅ Operational Only</option>
+                    <option value="Not Operational">❌ Not Operational</option>
+                    <option value="Closed for Construction">🚧 Under Construction</option>
+                </select>
+            </div>
+            
+            <div class="filter-group">
+                <label for="accessibilityFilter">♿ Accessibility:</label>
+                <select id="accessibilityFilter">
+                    <option value="all">All Facilities</option>
+                    <option value="Fully Accessible">♿ Fully Accessible</option>
+                    <option value="Partially Accessible">🚪 Partially Accessible</option>
+                </select>
+            </div>
+            
+            <div class="filter-group">
+                <label for="locationTypeFilter">🏢 Location Type:</label>
+                <select id="locationTypeFilter">
+                    <option value="all">All Types</option>
+                    <option value="Park">🌳 Parks</option>
+                    <option value="Library">📚 Libraries</option>
+                    <option value="Other">🏛️ Other Facilities</option>
+                </select>
+            </div>
+            
+            <div class="button-group">
+                <button id="resetAllFilters">🔄 Reset All Filters</button>
+                <button id="fitToRestrooms">🗺️ Fit to All Data</button>
+                <button id="findNearMe">📍 Find Near Me</button>
+            </div>
+        </div>
+
+        <!-- Statistics Panel -->
+        <div class="stats-panel">
+            <h3>📈 Current Map Statistics</h3>
+            <div class="stats-grid">
+                <div class="stat-item">
+                    <span class="stat-number" id="totalVisible">0</span>
+                    <span class="stat-label">Visible Facilities</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-number" id="operationalCount">0</span>
+                    <span class="stat-label">Operational</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-number" id="accessibleCount">0</span>
+                    <span class="stat-label">Fully Accessible</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-number" id="parkCount">0</span>
+                    <span class="stat-label">Park Facilities</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Info Panel -->
+        <div class="info-panel">
+            <h3>ℹ️ How to Use This Map</h3>
+            <ul>
+                <li><strong>🖱️ Click</strong> any marker to see detailed facility information</li>
+                <li><strong>🔍 Search</strong> for specific facilities or neighborhoods</li>
+                <li><strong>🔽 Filter</strong> by status, accessibility, or location type</li>
+                <li><strong>📍 "Find Near Me"</strong> to locate facilities around your current position</li>
+                <li><strong>⌨️ Keyboard Shortcuts:</strong> F = Fit to data, R = Reset filters, Escape = Clear search</li>
+            </ul>
+        </div>
+
+    </main>
+    
+    <script src="https://api.mapbox.com/mapbox-gl-js/v2.15.0/mapbox-gl.js"></script>
+    <script src="restroom-map.js"></script>
+</body>
+</html>
