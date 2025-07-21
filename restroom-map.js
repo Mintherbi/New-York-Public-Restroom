@@ -19,9 +19,63 @@
 // Main application function
 var restroomMapApp = function() {
   // ============================================================================
+  // TOKEN MANAGEMENT
+  // ============================================================================
+  const STORAGE_KEY = 'mapbox_access_token';
+  let userToken = localStorage.getItem(STORAGE_KEY);
+  
+  // Check if we have a stored token, if not show modal
+  if (!userToken) {
+    showTokenModal();
+    return; // Exit until token is provided
+  }
+
+  // Initialize the map with the user's token
+  initializeMap(userToken);
+};
+
+// Show token input modal
+function showTokenModal() {
+  const modal = document.getElementById('tokenModal');
+  const tokenInput = document.getElementById('mapboxToken');
+  const submitButton = document.getElementById('submitToken');
+  
+  modal.classList.remove('hidden');
+  
+  // Handle token submission
+  submitButton.addEventListener('click', function() {
+    const token = tokenInput.value.trim();
+    
+    if (!token) {
+      alert('토큰을 입력해주세요!');
+      return;
+    }
+    
+    if (!token.startsWith('pk.')) {
+      alert('유효한 Mapbox 토큰을 입력해주세요. 토큰은 "pk."로 시작해야 합니다.');
+      return;
+    }
+    
+    // Store token and initialize map
+    localStorage.setItem('mapbox_access_token', token);
+    modal.classList.add('hidden');
+    initializeMap(token);
+  });
+  
+  // Handle Enter key
+  tokenInput.addEventListener('keypress', function(e) {
+    if (e.key === 'Enter') {
+      submitButton.click();
+    }
+  });
+}
+
+// Initialize map with provided token
+function initializeMap(token) {
+  // ============================================================================
   // MAPBOX CONFIGURATION
   // ============================================================================
-  mapboxgl.accessToken = 'pk.eyJ1Ijoiam9yZDk3IiwiYSI6ImNtZDZsMGhnajBhemsybXBzdTBra255enQifQ.I_w0vjOBfXlpyolLu-0CzA';
+  mapboxgl.accessToken = token;
 
   const map = new mapboxgl.Map({
       container: 'mapbox-container-restrooms',
@@ -72,6 +126,7 @@ var restroomMapApp = function() {
   map.on('load', () => {
       console.log('🗺️ Map loaded successfully!');
       loadRestroomData();
+      addTokenControls(); // Add token management controls
   });
 
   // ============================================================================
@@ -482,7 +537,35 @@ var restroomMapApp = function() {
   // ============================================================================
   console.log('🚻 NYC Public Restrooms Map Application Initialized');
   console.log('🎮 Keyboard Shortcuts: F = Fit to data, R = Reset filters, Escape = Clear search');
-};
+  
+  // Add token reset functionality (for debugging/testing)
+  window.resetMapboxToken = function() {
+    localStorage.removeItem('mapbox_access_token');
+    location.reload();
+  };
+}
+
+// Add token management controls to the page
+function addTokenControls() {
+  const controls = document.querySelector('.controls');
+  if (controls && localStorage.getItem('mapbox_access_token')) {
+    const tokenControl = document.createElement('div');
+    tokenControl.className = 'filter-group';
+    tokenControl.innerHTML = `
+      <button id="resetToken" style="background: #dc2626; color: white; padding: 8px 16px; border: none; border-radius: 4px; cursor: pointer; font-size: 12px;">
+        🔑 Change Token
+      </button>
+    `;
+    controls.appendChild(tokenControl);
+    
+    document.getElementById('resetToken').addEventListener('click', function() {
+      if (confirm('토큰을 변경하시겠습니까? 페이지가 새로고침됩니다.')) {
+        localStorage.removeItem('mapbox_access_token');
+        location.reload();
+      }
+    });
+  }
+}
 
 // Execute the application
 restroomMapApp();

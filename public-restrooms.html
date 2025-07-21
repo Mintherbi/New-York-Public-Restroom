@@ -10,6 +10,28 @@
 </head>
 <body>
 
+    <!-- Token Input Modal -->
+    <div id="tokenModal" class="modal">
+        <div class="modal-content">
+            <h2>🗝️ Mapbox Access Token Required</h2>
+            <p>To use this interactive map, please enter your Mapbox access token:</p>
+            <div class="token-input-group">
+                <input type="text" id="mapboxToken" placeholder="Enter your Mapbox access token here..." />
+                <button id="submitToken">Start Map</button>
+            </div>
+            <div class="token-help">
+                <p><strong>How to get a Mapbox token:</strong></p>
+                <ol>
+                    <li>Visit <a href="https://account.mapbox.com/" target="_blank">account.mapbox.com</a></li>
+                    <li>Sign up for a free account</li>
+                    <li>Go to "Access tokens" section</li>
+                    <li>Copy your default public token</li>
+                </ol>
+                <p><small>Your token will be stored locally for future visits.</small></p>
+            </div>
+        </div>
+    </div>
+
     <main>
         <div class="project-title">NYC Public Restrooms Finder</div>
         <div class="project-subtitle">Interactive Map & Real-time Status</div>
