@@ -24,23 +24,24 @@ var restroomMapApp = function() {
   const STORAGE_KEY = 'mapbox_access_token';
   let userToken = localStorage.getItem(STORAGE_KEY);
   
-  // Check if we have a stored token, if not show modal
-  if (!userToken) {
-    showTokenModal();
-    return; // Exit until token is provided
+  // Check if we have a stored token
+  if (userToken) {
+    // Hide token section and show map
+    document.getElementById('tokenSection').classList.add('hidden');
+    document.getElementById('mapSection').classList.remove('hidden');
+    initializeMap(userToken);
+  } else {
+    // Show token section and hide map
+    document.getElementById('tokenSection').classList.remove('hidden');
+    document.getElementById('mapSection').classList.add('hidden');
+    setupTokenInput();
   }
-
-  // Initialize the map with the user's token
-  initializeMap(userToken);
 };
 
-// Show token input modal
-function showTokenModal() {
-  const modal = document.getElementById('tokenModal');
+// Setup token input handling
+function setupTokenInput() {
   const tokenInput = document.getElementById('mapboxToken');
   const submitButton = document.getElementById('submitToken');
-  
-  modal.classList.remove('hidden');
   
   // Handle token submission
   submitButton.addEventListener('click', function() {
@@ -48,17 +49,31 @@ function showTokenModal() {
     
     if (!token) {
       alert('토큰을 입력해주세요!');
+      tokenInput.focus();
       return;
     }
     
     if (!token.startsWith('pk.')) {
       alert('유효한 Mapbox 토큰을 입력해주세요. 토큰은 "pk."로 시작해야 합니다.');
+      tokenInput.focus();
       return;
     }
     
     // Store token and initialize map
     localStorage.setItem('mapbox_access_token', token);
-    modal.classList.add('hidden');
+    
+    // Hide token section and show map with animation
+    document.getElementById('tokenSection').classList.add('hidden');
+    document.getElementById('mapSection').classList.remove('hidden');
+    
+    // Scroll to map section
+    setTimeout(() => {
+      document.getElementById('mapSection').scrollIntoView({ 
+        behavior: 'smooth', 
+        block: 'start' 
+      });
+    }, 100);
+    
     initializeMap(token);
   });
   
@@ -68,6 +83,11 @@ function showTokenModal() {
       submitButton.click();
     }
   });
+  
+  // Auto-focus on token input
+  setTimeout(() => {
+    tokenInput.focus();
+  }, 100);
 }
 
 // Initialize map with provided token
@@ -97,6 +117,8 @@ function initializeMap(token) {
       locationType: 'all'
   };
   let userLocation = null;
+  let isHeatmapVisible = false;
+  let heatmapData = null;
 
   // ============================================================================
   // MAP SETUP AND CONTROLS
@@ -124,7 +146,7 @@ function initializeMap(token) {
   // MAP LOAD EVENT
   // ============================================================================
   map.on('load', () => {
-      console.log('🗺️ Map loaded successfully!');
+      console.log('Map loaded successfully!');
       loadRestroomData();
       addTokenControls(); // Add token management controls
   });
@@ -133,7 +155,7 @@ function initializeMap(token) {
   // DATA LOADING FUNCTION
   // ============================================================================
   function loadRestroomData() {
-      console.log('📊 Loading public restroom data...');
+      console.log('Loading public restroom data...');
       
       fetch('Public Restrooms_20250720.geojson')
           .then(response => {
@@ -143,21 +165,20 @@ function initializeMap(token) {
               return response.json();
           })
           .then(data => {
-              console.log('✅ Restroom data loaded successfully!');
-              console.log(`📍 Total facilities: ${data.features.length}`);
+              console.log('Restroom data loaded successfully!');
+              console.log(`Total facilities: ${data.features.length}`);
               
               allRestroomData = data;
               setupMapLayers(data);
               setupEventListeners();
-              updateStatistics();
               
               // Auto-fit map to data
               fitMapToData();
               
-              console.log('🎉 Map initialization complete!');
+              console.log('Map initialization complete!');
           })
           .catch(error => {
-              console.error('❌ Error loading restroom data:', error);
+              console.error('Error loading restroom data:', error);
               showErrorMessage(error);
           });
   }
@@ -323,6 +344,241 @@ function initializeMap(token) {
   }
 
   // ============================================================================
+  // HEAT MAP FUNCTIONS
+  // ============================================================================
+  function generateCoverageHeatmap() {
+      if (!allRestroomData) return;
+
+      console.log('Generating emergency zone analysis with moderate criteria (1km max danger zone)...');
+
+      // NYC bounds with slightly expanded area for better coverage
+      const nycBounds = {
+          north: 40.925,
+          south: 40.470,
+          east: -73.680,
+          west: -74.280
+      };
+
+      const gridSize = 100; // 100x100 grid for higher resolution
+      const latStep = (nycBounds.north - nycBounds.south) / gridSize;
+      const lngStep = (nycBounds.east - nycBounds.west) / gridSize;
+
+      const heatmapPoints = [];
+      
+      // Pre-extract restroom coordinates for faster processing
+      const restroomCoords = allRestroomData.features.map(restroom => 
+          restroom.geometry.coordinates
+      );
+
+      console.log(`Processing ${gridSize}x${gridSize} grid (${gridSize * gridSize} points)...`);
+
+      // Generate grid points and calculate distance to nearest restroom
+      for (let i = 0; i < gridSize; i++) {
+          for (let j = 0; j < gridSize; j++) {
+              const lat = nycBounds.south + (i * latStep);
+              const lng = nycBounds.west + (j * lngStep);
+
+              // Find nearest restroom using optimized distance calculation
+              let minDistance = Infinity;
+              for (const coords of restroomCoords) {
+                  const [rLng, rLat] = coords;
+                  const distance = calculateFastDistance(lat, lng, rLat, rLng);
+                  if (distance < minDistance) {
+                      minDistance = distance;
+                  }
+              }
+
+              // Enhanced intensity calculation with more generous scaling
+              const maxDistance = 1000; // 1km max distance for more generous scaling
+              let intensity = Math.min(minDistance / maxDistance, 1);
+              
+              // Apply moderate non-linear scaling for better contrast
+              intensity = Math.pow(intensity, 0.6);
+
+              heatmapPoints.push([lng, lat, intensity]);
+          }
+      }
+
+      console.log(`Generated ${heatmapPoints.length} heatmap points`);
+
+      return {
+          type: 'FeatureCollection',
+          features: [{
+              type: 'Feature',
+              geometry: {
+                  type: 'Point',
+                  coordinates: [0, 0] // Dummy point
+              },
+              properties: {
+                  heatmapData: heatmapPoints
+              }
+          }]
+      };
+  }
+
+  // Faster distance calculation for heatmap generation
+  function calculateFastDistance(lat1, lng1, lat2, lng2) {
+      // Simplified distance calculation for performance
+      const dLat = (lat2 - lat1) * 111000; // ~111km per degree latitude
+      const dLng = (lng2 - lng1) * 85000; // ~85km per degree longitude at NYC latitude
+      return Math.sqrt(dLat * dLat + dLng * dLng);
+  }
+
+  function calculateDistance(lat1, lng1, lat2, lng2) {
+      const R = 6371000; // Earth's radius in meters
+      const dLat = (lat2 - lat1) * Math.PI / 180;
+      const dLng = (lng2 - lng1) * Math.PI / 180;
+      const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
+                Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+                Math.sin(dLng/2) * Math.sin(dLng/2);
+      const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+      return R * c;
+  }
+
+  function toggleHeatmap() {
+      const button = document.getElementById('toggleHeatmap');
+      const legend = document.getElementById('heatmapLegend');
+
+      console.log('Toggle heatmap clicked. Current state:', isHeatmapVisible);
+
+      if (!isHeatmapVisible) {
+          // Generate and show heatmap
+          if (!heatmapData) {
+              button.textContent = 'Generating Danger Zone Analysis...';
+              button.disabled = true;
+              
+              setTimeout(() => {
+                  console.log('Generating emergency zone analysis...');
+                  const startTime = performance.now();
+                  heatmapData = generateCoverageHeatmap();
+                  const endTime = performance.now();
+                  console.log(`Emergency zone analysis completed in ${(endTime - startTime).toFixed(2)}ms`);
+                  console.log('Heatmap data generated:', heatmapData);
+                  
+                  addHeatmapLayer();
+                  isHeatmapVisible = true;
+                  button.textContent = 'Hide Danger Zone Analysis';
+                  button.disabled = false;
+                  legend.classList.remove('hidden');
+                  console.log('Danger zone analysis layer added and visible');
+              }, 100);
+          } else {
+              addHeatmapLayer();
+              isHeatmapVisible = true;
+              button.textContent = 'Hide Danger Zone Analysis';
+              legend.classList.remove('hidden');
+              console.log('Existing danger zone analysis made visible');
+          }
+      } else {
+          // Hide heatmap
+          removeHeatmapLayer();
+          isHeatmapVisible = false;
+          button.textContent = 'Show Danger Zone Analysis';
+          legend.classList.add('hidden');
+          console.log('Danger zone analysis hidden');
+      }
+  }
+
+  function addHeatmapLayer() {
+      if (!heatmapData) {
+          console.error('No heatmap data available');
+          return;
+      }
+
+      console.log('Adding heatmap layer...');
+
+      // Remove existing layer if it exists
+      if (map.getLayer('heatmap-layer')) {
+          map.removeLayer('heatmap-layer');
+      }
+      if (map.getSource('heatmap-source')) {
+          map.removeSource('heatmap-source');
+      }
+
+      const heatmapPoints = heatmapData.features[0].properties.heatmapData;
+      console.log('Heatmap points count:', heatmapPoints.length);
+      
+      // Create GeoJSON from heatmap points
+      const heatmapGeoJSON = {
+          type: 'FeatureCollection',
+          features: heatmapPoints.map(point => ({
+              type: 'Feature',
+              geometry: {
+                  type: 'Point',
+                  coordinates: [point[0], point[1]]
+              },
+              properties: {
+                  intensity: point[2]
+              }
+          }))
+      };
+
+      console.log('Created heatmap GeoJSON with', heatmapGeoJSON.features.length, 'features');
+
+      map.addSource('heatmap-source', {
+          type: 'geojson',
+          data: heatmapGeoJSON
+      });
+
+      map.addLayer({
+          id: 'heatmap-layer',
+          type: 'heatmap',
+          source: 'heatmap-source',
+          maxzoom: 15,
+          paint: {
+              'heatmap-weight': ['get', 'intensity'],
+              'heatmap-intensity': [
+                  'interpolate',
+                  ['linear'],
+                  ['zoom'],
+                  0, 0.7,
+                  10, 1.0,
+                  15, 1.8
+              ],
+              'heatmap-color': [
+                  'interpolate',
+                  ['linear'],
+                  ['heatmap-density'],
+                  0, 'rgba(0,255,0,0)',
+                  0.1, 'rgba(0,255,0,0.5)',     // Safe: < 200m
+                  0.3, 'rgba(128,255,0,0.6)',   // Caution: 200-400m
+                  0.5, 'rgba(255,255,0,0.6)',   // Risk: 400-600m
+                  0.7, 'rgba(255,128,0,0.7)',   // Danger: 600-800m
+                  0.9, 'rgba(255,64,0,0.8)',    // High Danger: 800-1000m
+                  1, 'rgba(255,0,0,0.9)'        // Critical: > 1000m
+              ],
+              'heatmap-radius': [
+                  'interpolate',
+                  ['linear'],
+                  ['zoom'],
+                  0, 18,
+                  10, 30,
+                  15, 45
+              ],
+              'heatmap-opacity': [
+                  'interpolate',
+                  ['linear'],
+                  ['zoom'],
+                  0, 0.6,
+                  10, 0.7,
+                  15, 0.8
+              ]
+          }
+      }, 'restroom-points');
+
+      console.log('Emergency zone analysis layer added successfully');
+  }
+
+  function removeHeatmapLayer() {
+      if (map.getLayer('heatmap-layer')) {
+          map.removeLayer('heatmap-layer');
+      }
+      if (map.getSource('heatmap-source')) {
+          map.removeSource('heatmap-source');
+      }
+  }
+
+  // ============================================================================
   // EVENT LISTENERS SETUP
   // ============================================================================
   function setupEventListeners() {
@@ -354,6 +610,7 @@ function initializeMap(token) {
       document.getElementById('resetAllFilters').addEventListener('click', resetAllFilters);
       document.getElementById('fitToRestrooms').addEventListener('click', fitMapToData);
       document.getElementById('findNearMe').addEventListener('click', findNearMe);
+      document.getElementById('toggleHeatmap').addEventListener('click', toggleHeatmap);
 
       // Keyboard shortcuts
       document.addEventListener('keydown', handleKeyboardShortcuts);
@@ -404,26 +661,6 @@ function initializeMap(token) {
           type: 'FeatureCollection',
           features: filteredFeatures
       });
-
-      updateStatistics(filteredFeatures);
-  }
-
-  // ============================================================================
-  // STATISTICS UPDATE
-  // ============================================================================
-  function updateStatistics(features = null) {
-      const data = features || allRestroomData.features;
-      
-      document.getElementById('totalVisible').textContent = data.length;
-      
-      const operational = data.filter(f => f.properties.status === 'Operational').length;
-      document.getElementById('operationalCount').textContent = operational;
-      
-      const accessible = data.filter(f => f.properties.accessibility === 'Fully Accessible').length;
-      document.getElementById('accessibleCount').textContent = accessible;
-      
-      const parks = data.filter(f => f.properties.location_type === 'Park').length;
-      document.getElementById('parkCount').textContent = parks;
   }
 
   // ============================================================================
@@ -553,15 +790,34 @@ function addTokenControls() {
     tokenControl.className = 'filter-group';
     tokenControl.innerHTML = `
       <button id="resetToken" style="background: #dc2626; color: white; padding: 8px 16px; border: none; border-radius: 4px; cursor: pointer; font-size: 12px;">
-        🔑 Change Token
+        Change Token
       </button>
     `;
     controls.appendChild(tokenControl);
     
     document.getElementById('resetToken').addEventListener('click', function() {
-      if (confirm('토큰을 변경하시겠습니까? 페이지가 새로고침됩니다.')) {
+      if (confirm('토큰을 변경하시겠습니까? 토큰 입력 화면으로 돌아갑니다.')) {
         localStorage.removeItem('mapbox_access_token');
-        location.reload();
+        
+        // Show token section and hide map
+        document.getElementById('mapSection').classList.add('hidden');
+        document.getElementById('tokenSection').classList.remove('hidden');
+        
+        // Clear the token input and focus
+        const tokenInput = document.getElementById('mapboxToken');
+        tokenInput.value = '';
+        
+        // Scroll to token section
+        setTimeout(() => {
+          document.getElementById('tokenSection').scrollIntoView({ 
+            behavior: 'smooth', 
+            block: 'start' 
+          });
+          tokenInput.focus();
+        }, 100);
+        
+        // Re-setup token input handlers
+        setupTokenInput();
       }
     });
   }

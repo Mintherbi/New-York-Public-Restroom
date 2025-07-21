@@ -494,7 +494,228 @@ p {
     }
 }
 
-/* Token Modal Styles */
+/* Token Section Styles */
+.token-section {
+    background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+    border: 2px solid #cbd5e1;
+    border-radius: 12px;
+    padding: 30px;
+    margin: 30px 0;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
+
+.token-input-container {
+    background: white;
+    border-radius: 8px;
+    padding: 25px;
+    margin-top: 20px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.token-input-group {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 25px;
+    flex-wrap: wrap;
+}
+
+.token-input-group input {
+    flex: 1;
+    min-width: 300px;
+    padding: 15px 20px;
+    border: 2px solid #e5e7eb;
+    border-radius: 8px;
+    font-size: 16px;
+    font-family: 'Roboto Mono', monospace;
+    transition: all 0.3s ease;
+    background: #fafafa;
+}
+
+.token-input-group input:focus {
+    outline: none;
+    border-color: #2563eb;
+    background: white;
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+    transform: translateY(-1px);
+}
+
+.token-input-group button {
+    padding: 15px 30px;
+    background: linear-gradient(135deg, #2563eb, #1d4ed8);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    white-space: nowrap;
+    min-width: 150px;
+}
+
+.token-input-group button:hover {
+    background: linear-gradient(135deg, #1d4ed8, #1e40af);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(37, 99, 235, 0.3);
+}
+
+.token-input-group button:disabled {
+    background: #9ca3af;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+}
+
+.token-help {
+    background: #f1f5f9;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    padding: 20px;
+}
+
+.help-header {
+    font-weight: 600;
+    color: #1e293b;
+    margin-bottom: 15px;
+    font-size: 16px;
+}
+
+.token-help ol {
+    margin: 15px 0;
+    padding-left: 20px;
+    color: #475569;
+}
+
+.token-help li {
+    margin: 8px 0;
+    line-height: 1.6;
+}
+
+.token-help a {
+    color: #2563eb;
+    text-decoration: none;
+    font-weight: 600;
+}
+
+.token-help a:hover {
+    text-decoration: underline;
+}
+
+.help-note {
+    margin-top: 15px;
+    color: #64748b;
+    font-style: italic;
+    font-size: 14px;
+}
+
+/* Hide/Show sections */
+.hidden {
+    display: none !important;
+}
+
+.map-section {
+    margin-top: 30px;
+}
+
+/* Heat Map Legend Styles */
+.heatmap-legend {
+    background: white;
+    border: 2px solid #e5e7eb;
+    border-radius: 8px;
+    padding: 20px;
+    margin: 20px 0;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.heatmap-legend h4 {
+    margin: 0 0 15px 0;
+    color: #1f2937;
+    font-size: 16px;
+    font-weight: 600;
+}
+
+.legend-content {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.legend-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 14px;
+}
+
+.legend-color {
+    width: 20px;
+    height: 15px;
+    border-radius: 3px;
+    border: 1px solid #ccc;
+}
+
+.legend-item span {
+    color: #374151;
+}
+
+.legend-note {
+    margin-top: 10px;
+    padding-top: 8px;
+    border-top: 1px solid #e5e7eb;
+}
+
+.legend-note small {
+    color: #6b7280;
+    font-style: italic;
+}
+
+/* Mobile responsiveness for legend */
+@media (max-width: 768px) {
+    .heatmap-legend {
+        padding: 15px;
+        margin: 15px 0;
+    }
+    
+    .legend-content {
+        gap: 6px;
+    }
+    
+    .legend-item {
+        font-size: 13px;
+    }
+    
+    .legend-color {
+        width: 18px;
+        height: 13px;
+    }
+}
+
+/* Mobile responsiveness for token section */
+@media (max-width: 768px) {
+    .token-input-group {
+        flex-direction: column;
+    }
+    
+    .token-input-group input {
+        min-width: auto;
+        width: 100%;
+    }
+    
+    .token-input-group button {
+        width: 100%;
+    }
+    
+    .token-section {
+        padding: 20px;
+        margin: 20px 0;
+    }
+    
+    .token-input-container {
+        padding: 20px;
+    }
+}
+
+/* Token Modal Styles - Keep for backwards compatibility but unused */
 .modal {
     display: flex;
     position: fixed;

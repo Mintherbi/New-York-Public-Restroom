@@ -3,125 +3,137 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NYC Public Restrooms - Interactive Map</title>
+    <title>NYC Emergency Zones - Areas to Avoid When Nature Calls</title>
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700&display=swap" rel="stylesheet">
     <link href="https://api.mapbox.com/mapbox-gl-js/v2.15.0/mapbox-gl.css" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-    <!-- Token Input Modal -->
-    <div id="tokenModal" class="modal">
-        <div class="modal-content">
-            <h2>🗝️ Mapbox Access Token Required</h2>
-            <p>To use this interactive map, please enter your Mapbox access token:</p>
-            <div class="token-input-group">
-                <input type="text" id="mapboxToken" placeholder="Enter your Mapbox access token here..." />
-                <button id="submitToken">Start Map</button>
-            </div>
-            <div class="token-help">
-                <p><strong>How to get a Mapbox token:</strong></p>
-                <ol>
-                    <li>Visit <a href="https://account.mapbox.com/" target="_blank">account.mapbox.com</a></li>
-                    <li>Sign up for a free account</li>
-                    <li>Go to "Access tokens" section</li>
-                    <li>Copy your default public token</li>
-                </ol>
-                <p><small>Your token will be stored locally for future visits.</small></p>
+    <main>
+        <div class="project-title">NYC Emergency Zones Map</div>
+        <div class="project-subtitle">Areas to Avoid When You Really Need a Restroom</div>
+
+        <div class="section-title">Digital Object: Urban Emergency Navigation</div>
+        <p>This interactive map reveals the most dangerous zones in New York City for those experiencing a restroom emergency. The red zones indicate areas where you could be stuck for dangerously long distances from the nearest public facility. Use this map to plan your routes wisely and avoid getting caught in a bathroom desert!</p>
+
+        <!-- Mapbox Token Input Section -->
+        <div id="tokenSection" class="token-section">
+            <div class="section-title">Setup: Enter Your Mapbox Access Token</div>
+            <p>To display the emergency zones map, please enter your Mapbox access token below:</p>
+            <div class="token-input-container">
+                <div class="token-input-group">
+                    <input type="text" id="mapboxToken" placeholder="Enter your Mapbox access token here..." />
+                    <button id="submitToken">Load Map</button>
+                </div>
+                <div class="token-help">
+                    <div class="help-header">How to get a Mapbox token:</div>
+                    <ol>
+                        <li>Visit <a href="https://account.mapbox.com/" target="_blank">account.mapbox.com</a></li>
+                        <li>Sign up for a free account</li>
+                        <li>Go to "Access tokens" section</li>
+                        <li>Copy your default public token</li>
+                    </ol>
+                    <p class="help-note">Your token will be saved locally for future visits.</p>
+                </div>
             </div>
         </div>
-    </div>
 
-    <main>
-        <div class="project-title">NYC Public Restrooms Finder</div>
-        <div class="project-subtitle">Interactive Map & Real-time Status</div>
-
-        <div class="section-title">Digital Object: Public Facilities Mapping</div>
-        <p>This interactive map displays all public restrooms across New York City, including parks, libraries, and other public facilities. Find nearby restrooms with detailed information about accessibility, operating hours, and current status. Perfect for tourists, residents, and anyone exploring the city!</p>
-
-        <!-- Main Map Section -->
-        <div class="section-title">🚻 NYC Public Restrooms Interactive Map</div>
-        <p>Explore over 1,000 public restroom locations throughout NYC. Click on any marker to see detailed information including accessibility features, operating hours, changing stations, and current operational status. Use the filters below to find exactly what you need!</p>
-        
-        <div id="mapbox-container-restrooms"></div>
-        
-        <!-- Enhanced Controls Section -->
-        <div class="controls">
+        <!-- Main Map Section (Hidden until token is provided) -->
+        <div id="mapSection" class="map-section hidden">
+            <div class="section-title">NYC Restroom Emergency Zones Map</div>
+            <p>Explore the most dangerous areas for bathroom emergencies across NYC. Green dots show safe havens (public restrooms), while the red heat zones reveal where you definitely don't want to be caught when nature calls. Use the analysis tools below to identify the riskiest neighborhoods!</p>
+            
+            <div id="mapbox-container-restrooms"></div>
+            
+            <!-- Enhanced Controls Section -->
+            <div class="controls">
             <div class="filter-group">
-                <label for="searchFacility">🔍 Search Facilities:</label>
-                <input type="text" id="searchFacility" placeholder="Search by facility name or location...">
+                <label for="searchFacility">Search Safe Zones:</label>
+                <input type="text" id="searchFacility" placeholder="Search for restroom locations or areas...">
             </div>
             
             <div class="filter-group">
-                <label for="statusFilter">📊 Status Filter:</label>
+                <label for="statusFilter">Facility Status:</label>
                 <select id="statusFilter">
                     <option value="all">All Facilities</option>
-                    <option value="Operational">✅ Operational Only</option>
-                    <option value="Not Operational">❌ Not Operational</option>
-                    <option value="Closed for Construction">🚧 Under Construction</option>
+                    <option value="Operational">Safe Zones Only</option>
+                    <option value="Not Operational">Avoid These</option>
+                    <option value="Closed for Construction">Temporarily Unavailable</option>
                 </select>
             </div>
             
             <div class="filter-group">
-                <label for="accessibilityFilter">♿ Accessibility:</label>
+                <label for="accessibilityFilter">Emergency Access:</label>
                 <select id="accessibilityFilter">
-                    <option value="all">All Facilities</option>
-                    <option value="Fully Accessible">♿ Fully Accessible</option>
-                    <option value="Partially Accessible">🚪 Partially Accessible</option>
+                    <option value="all">All Access Types</option>
+                    <option value="Fully Accessible">Fully Accessible</option>
+                    <option value="Partially Accessible">Limited Access</option>
                 </select>
             </div>
             
             <div class="filter-group">
-                <label for="locationTypeFilter">🏢 Location Type:</label>
+                <label for="locationTypeFilter">Safe Zone Type:</label>
                 <select id="locationTypeFilter">
                     <option value="all">All Types</option>
-                    <option value="Park">🌳 Parks</option>
-                    <option value="Library">📚 Libraries</option>
-                    <option value="Other">🏛️ Other Facilities</option>
+                    <option value="Park">Parks</option>
+                    <option value="Library">Libraries</option>
+                    <option value="Other">Other Safe Zones</option>
                 </select>
             </div>
             
             <div class="button-group">
-                <button id="resetAllFilters">🔄 Reset All Filters</button>
-                <button id="fitToRestrooms">🗺️ Fit to All Data</button>
-                <button id="findNearMe">📍 Find Near Me</button>
+                <button id="resetAllFilters">Reset All Filters</button>
+                <button id="fitToRestrooms">Show All Zones</button>
+                <button id="findNearMe">Find Safe Zones Near Me</button>
+                <button id="toggleHeatmap">Show Danger Zone Analysis</button>
             </div>
         </div>
 
-        <!-- Statistics Panel -->
-        <div class="stats-panel">
-            <h3>📈 Current Map Statistics</h3>
-            <div class="stats-grid">
-                <div class="stat-item">
-                    <span class="stat-number" id="totalVisible">0</span>
-                    <span class="stat-label">Visible Facilities</span>
+        <!-- Heat Map Legend -->
+        <div id="heatmapLegend" class="heatmap-legend hidden">
+            <h4>Bathroom Emergency Danger Zone Analysis</h4>
+            <div class="legend-content">
+                <div class="legend-item">
+                    <div class="legend-color" style="background: #00ff00;"></div>
+                    <span>Safe Zone (&lt; 200m to restroom)</span>
                 </div>
-                <div class="stat-item">
-                    <span class="stat-number" id="operationalCount">0</span>
-                    <span class="stat-label">Operational</span>
+                <div class="legend-item">
+                    <div class="legend-color" style="background: #80ff00;"></div>
+                    <span>Caution Zone (200-400m)</span>
                 </div>
-                <div class="stat-item">
-                    <span class="stat-number" id="accessibleCount">0</span>
-                    <span class="stat-label">Fully Accessible</span>
+                <div class="legend-item">
+                    <div class="legend-color" style="background: #ffff00;"></div>
+                    <span>Risk Zone (400-600m)</span>
                 </div>
-                <div class="stat-item">
-                    <span class="stat-number" id="parkCount">0</span>
-                    <span class="stat-label">Park Facilities</span>
+                <div class="legend-item">
+                    <div class="legend-color" style="background: #ff8000;"></div>
+                    <span>Danger Zone (600-800m)</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color" style="background: #ff0000;"></div>
+                    <span>AVOID AT ALL COSTS (&gt; 800m)</span>
+                </div>
+                <div class="legend-note">
+                    <small>Based on 100×100 grid analysis - Don't get caught in the red zones!</small>
                 </div>
             </div>
         </div>
 
         <!-- Info Panel -->
         <div class="info-panel">
-            <h3>ℹ️ How to Use This Map</h3>
+            <h3>How to Use This Emergency Zone Map</h3>
             <ul>
-                <li><strong>🖱️ Click</strong> any marker to see detailed facility information</li>
-                <li><strong>🔍 Search</strong> for specific facilities or neighborhoods</li>
-                <li><strong>🔽 Filter</strong> by status, accessibility, or location type</li>
-                <li><strong>📍 "Find Near Me"</strong> to locate facilities around your current position</li>
-                <li><strong>⌨️ Keyboard Shortcuts:</strong> F = Fit to data, R = Reset filters, Escape = Clear search</li>
+                <li><strong>Click</strong> green markers to see safe restroom locations</li>
+                <li><strong>Search</strong> for specific areas or neighborhoods to check</li>
+                <li><strong>Filter</strong> by facility status and accessibility</li>
+                <li><strong>"Find Safe Zones Near Me"</strong> to locate emergency options nearby</li>
+                <li><strong>"Danger Zone Analysis"</strong> reveals the riskiest areas to avoid</li>
+                <li><strong>Red zones = DANGER!</strong> Plan your route to avoid these areas</li>
             </ul>
         </div>
+        
+        </div> <!-- End of mapSection -->
 
     </main>
     
